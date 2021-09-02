@@ -1,5 +1,9 @@
 # Fly.io Full Stack Phoenix Hiring Project
 
+
+![Screen Recording 2021-09-02 at 12 38 24 PM](https://user-images.githubusercontent.com/5628/131927435-02e19455-3168-4926-8577-48978837022d.gif)
+
+
 Hello! This is a hiring project for our [Full Stack developer position](https://fly.io/blog/fly-io-is-hiring-full-stack-developers/). If you apply, we'll ask you to do this project so we can assess your ability build customer facing features with the Fly.io GraphQL api in an Elixir/Phoenix/LiveView application.
 
 ## The Job
