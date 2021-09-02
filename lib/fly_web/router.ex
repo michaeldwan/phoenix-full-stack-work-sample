@@ -27,6 +27,7 @@ defmodule FlyWeb.Router do
       live "/apps", AppLive.Index, :index
       live "/apps/:name", AppLive.Show, :show
     end
+    live("/apps/:name/status", AppLive.Status, :status)
   end
 
   scope "/", FlyWeb do

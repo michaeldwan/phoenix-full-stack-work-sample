@@ -230,6 +230,143 @@ defmodule Fly.Client do
     end
   end
 
+  def fetch_app_vms(name, show_completed, config) do
+    """
+    query($appName: String!, $showCompleted: Boolean!) {
+      app(name: $appName) {
+        id
+        name
+        deployed
+        status
+        hostname
+        version
+        appUrl
+        organization {
+          slug
+        }
+        deploymentStatus {
+          id
+          status
+          version
+          description
+          placedCount
+          promoted
+          desiredCount
+          healthyCount
+          unhealthyCount
+        }
+        vms(showCompleted: $showCompleted) {
+          totalCount
+          nodes {
+            id
+            idShort
+            version
+            latestVersion
+            status
+            desiredStatus
+            transitioning
+            totalCheckCount
+            passingCheckCount
+            warningCheckCount
+            criticalCheckCount
+            createdAt
+            updatedAt
+            canary
+            region
+            restarts
+            healthy
+            privateIP
+            taskName
+            checks {
+              status
+              output
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    |> perform_query(%{appName: name, showCompleted: show_completed}, config, :fetch_app)
+    |> handle_response()
+    |> case do
+      {:ok, %{"app" => app}} ->
+        Logger.info("app returned: #{inspect(app)}")
+        {:ok, app}
+
+      {:error, _reason} = error ->
+        error
+
+      other ->
+        Logger.error("Unexpected result from fetch_app_vms. Response: #{inspect(other)}")
+
+        {:error, "Failed to fetch app"}
+    end
+  end
+
+  def restart_vm(app_name, id, config) do
+    """
+    mutation($input: RestartAllocationInput!) {
+      restartAllocation(input: $input) {
+        app {
+          name
+        }
+        allocation {
+          id
+        }
+      }
+    }
+
+    """
+    |> perform_query(%{input: %{appId: app_name, allocId: id}}, config, :fetch_apps)
+    |> handle_response()
+    |> case do
+      {:ok, %{"viewer" => viewer}} ->
+        Logger.info("viewer returned: #{inspect(viewer)}")
+        {:ok, viewer}
+
+      {:error, _reason} = error ->
+        error
+
+      other ->
+        Logger.error("Unexpected result from restart_vm. Response: #{inspect(other)}")
+
+        {:error, "Failed to restart vm"}
+    end
+  end
+
+  def stop_vm(app_name, id, config) do
+    """
+    mutation($input: StopAllocationInput!) {
+      stopAllocation(input: $input) {
+        app {
+          name
+        }
+        allocation {
+          id
+        }
+      }
+    }
+
+
+    """
+    |> perform_query(%{input: %{appId: app_name, allocId: id}}, config, :fetch_apps)
+    |> handle_response()
+    |> case do
+      {:ok, %{"viewer" => viewer}} ->
+        Logger.info("viewer returned: #{inspect(viewer)}")
+        {:ok, viewer}
+
+      {:error, _reason} = error ->
+        error
+
+      other ->
+        Logger.error("Unexpected result from stop_vm. Response: #{inspect(other)}")
+
+        {:error, "Failed to restart vm"}
+    end
+  end
+
   def fetch_current_user(config) do
     """
       query {
